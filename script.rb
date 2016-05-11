@@ -16,7 +16,7 @@ end
 
 def read_answers(filename)
 	File.foreach(filename).with_index do |line, line_num| 
-		if line_num != 1 
+		if line_num != 0 
 			begin
 				answers = CSV.parse_line(line, col_sep: ",")
 			rescue CSV::MalformedCSVError => er
@@ -40,8 +40,11 @@ end
 
 def print_to_file(out_file)
 	File.open(out_file, "w") { |f|
-		$answers.each { |e|
-			e.each { |x|
+		$answers.each_with_index { |e, index|
+			e.each_with_index { |x, i|
+				f.write($labels[i])
+				f.write(": ")
+
 				f.write(x)
 				f.write("\n")
 			}
@@ -50,8 +53,13 @@ def print_to_file(out_file)
 	}
 end
 
-# main functions
+# read field headers
 read_headers("data.csv")
+puts $labels
+
+# read responses
 read_answers("data.csv")
 fill_in_blanks()
+
+# print formatted contents to file
 print_to_file("out.txt")
